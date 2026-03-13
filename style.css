@@ -239,4 +239,19 @@ body {
     opacity:0.9;
     pointer-events:none;
 }
+@media (max-width: 768px){
+    .top-logo-container{
+        top: auto;
+        bottom: 85px;
+        left: 50%;
+        transform: translateX(-50%);
+        
+        padding: 8px 20px;
+        border-radius: 18px;
+    }
+
+    .top-logo{
+        width: 120px;
+    }
+}
 
