@@ -8,6 +8,12 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="intro">
+    <img src="esteem_logo.png" class="intro-img">
+    <div class="intro-overlay">
+        <p>Loading experience...</p>
+    </div>
+</div>
   <div class="panel">
     <div class="section">
       <h2 class="section-title">COLOR EXTERIOR</h2>
@@ -36,12 +42,45 @@
       </div>
     </div>
   </div>
+  <script>
+window.addEventListener("DOMContentLoaded", () => {
+    const viewer = document.querySelector("#boat");
+    const intro = document.querySelector("#intro");
+
+    if (!viewer || !intro) return;
+
+    const hideIntro = () => {
+        intro.style.transition = "opacity 1s ease";
+        intro.style.opacity = "0";
+
+        setTimeout(() => {
+            intro.style.display = "none";
+        }, 1000);
+    };
+
+    viewer.addEventListener("load", () => {
+        console.log("MODELO CARGADO");
+        hideIntro();
+    });
+
+    viewer.addEventListener("error", (e) => {
+        console.log("ERROR CARGANDO MODELO", e);
+    });
+
+    setTimeout(() => {
+        if (intro.style.display !== "none") {
+            console.log("Fallback: ocultando intro");
+            hideIntro();
+        }
+    }, 5000);
+});
+</script>
 
   <model-viewer
     id="boat"
     src="Z1_WEB_V5.glb"
     alt="boat"
-    shadow-intensity="1"
+    shadow-intensity="2.5"
     camera-controls
     camera-orbit="90deg 75deg 3m"
     style="width:100vw; height:100vh;"
@@ -198,6 +237,6 @@
     src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
   ></script>
   <img src="esteem_logo.png" class="esteem-logo">
+  <div class="noise"></div>
 </body>
-
 </html>
