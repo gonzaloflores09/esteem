@@ -8,11 +8,15 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="top-logo-container">
+    <img src="esteem_logo.png" class="top-logo">
+</div>
   <div id="intro">
-    <img src="esteem_logo.png" class="intro-img">
     <div class="intro-overlay">
+        <img src="esteem_logo.png" class="intro-logo">
         <p>Loading experience...</p>
     </div>
+</div>
 </div>
   <div class="panel">
     <div class="section">
@@ -97,7 +101,7 @@ function spinBoatOnce() {
     const viewer = document.querySelector("#boat");
 
     const startAngle = 90;
-    const endAngle = 450; // 90 + 360
+    const endAngle = 320; // 90 + 360
     const vertical = 75;
     const radius = "3m";
     const duration = 2500; // 2,5 segundos
@@ -273,9 +277,5 @@ function spinBoatOnce() {
     type="module"
     src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
   ></script>
-  <img src="esteem_logo.png" class="esteem-logo">
-  <div class="noise"></div>
 </body>
 </html>
-
-
