@@ -242,7 +242,7 @@ body {
 @media (max-width: 768px){
     .top-logo-container{
         top: auto;
-        bottom: 85px;
+        bottom: 60px;
         left: 50%;
         transform: translateX(-50%);
         
