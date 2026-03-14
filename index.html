@@ -21,20 +21,20 @@
     <div class="section">
       <h2 class="section-title">COLOR EXTERIOR</h2>
       <div class="colors">
-        <button class="swatch black" onclick="changeHull('#0b0b0b')"></button>
-        <button class="swatch grey" onclick="changeHull('#141414')"></button>
-        <button class="swatch white" onclick="changeHull('#f1f1f1')"></button>
-        <button class="swatch red" onclick="changeHull('#ff0000')"></button>
+       <button class="swatch exterior-swatch black active" onclick="setHull(this, '#0b0b0b')"></button>
+      <button class="swatch exterior-swatch grey" onclick="setHull(this, '#141414')"></button>
+      <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
+      <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
       </div>
     </div>
 
     <div class="section">
       <div class="section-title">COLOR INTERIOR</div>
       <div class="colors">
-        <button class="swatch black" onclick="changeInterior('#101010')"></button>
-        <button class="swatch grey" onclick="changeInterior('#3f3f3f')"></button>
-        <button class="swatch white" onclick="changeInterior('#f1f1f1')"></button>
-        <button class="swatch caramel" onclick="changeInterior('#c68642')"></button>
+        <button class="swatch interior-swatch black active" onclick="setInterior(this, '#101010')"></button>
+        <button class="swatch interior-swatch grey" onclick="setInterior(this, '#3f3f3f')"></button>
+        <button class="swatch interior-swatch white" onclick="setInterior(this, '#f1f1f1')"></button>
+        <button class="swatch interior-swatch caramel" onclick="setInterior(this, '#c68642')"></button>
       </div>
     </div>
 
@@ -97,6 +97,23 @@ window.addEventListener("DOMContentLoaded", () => {
   >
   </model-viewer>
   <script>
+    function setHull(button, color) {
+  document.querySelectorAll(".exterior-swatch").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  button.classList.add("active");
+  changeHull(color);
+}
+
+function setInterior(button, color) {
+  document.querySelectorAll(".interior-swatch").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  button.classList.add("active");
+  changeInterior(color);
+}
 function spinBoatOnce() {
     const viewer = document.querySelector("#boat");
 
