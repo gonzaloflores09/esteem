@@ -189,7 +189,7 @@ body {
     inset:0;
     background-image:url("noise.png");
     background-repeat:repeat;
-    opacity:0.08;
+    opacity:0.12;
     pointer-events:none;
     z-index:1000000;
     mix-blend-mode:soft-light;
