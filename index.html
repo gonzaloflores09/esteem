@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -25,32 +25,70 @@
     </button>
 
     <div class="sidebar-inner">
-      <div class="panel">
-        <div class="section">
-          <h2 class="section-title">COLOR EXTERIOR</h2>
-          <div class="colors">
-            <button class="swatch exterior-swatch black" onclick="setHull(this, '#0b0b0b')"></button>
-            <button class="swatch exterior-swatch grey active" onclick="setHull(this, '#141414')"></button>  
-            <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
-            <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
+      <div class="sidebar-content">
+        <div class="panel">
+          <div class="section">
+            <h2 class="section-title">COLOR EXTERIOR</h2>
+            <div class="colors">
+              <button class="swatch exterior-swatch black" onclick="setHull(this, '#0b0b0b')"></button>
+              <button class="swatch exterior-swatch grey active" onclick="setHull(this, '#141414')"></button>
+              <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
+              <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">COLOR INTERIOR</div>
+            <div class="colors">
+              <button class="swatch interior-swatch black" onclick="setInterior(this, '#101010')"></button>
+              <button class="swatch interior-swatch grey" onclick="setInterior(this, '#3f3f3f')"></button>
+              <button class="swatch interior-swatch white active" onclick="setInterior(this, '#f1f1f1')"></button>
+              <button class="swatch interior-swatch caramel" onclick="setInterior(this, '#c68642')"></button>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">WAKE TOWER</div>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
+              <button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
+            </div>
           </div>
         </div>
 
-        <div class="section">
-          <div class="section-title">COLOR INTERIOR</div>
-          <div class="colors">
-            <button class="swatch interior-swatch black" onclick="setInterior(this, '#101010')"></button>
-            <button class="swatch interior-swatch grey active" onclick="setInterior(this, '#3f3f3f')"></button>
-            <button class="swatch interior-swatch white" onclick="setInterior(this, '#f1f1f1')"></button>
-            <button class="swatch interior-swatch caramel" onclick="setInterior(this, '#c68642')"></button>
+        <div class="tech-specs">
+          <div class="tech-header">
+            <div class="tech-kicker">MODELO</div>
+            <div class="tech-model">Z1</div>
           </div>
-        </div>
 
-        <div class="section">
-          <div class="section-title">WAKE TOWER</div>
-          <div class="toggle-group">
-            <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
-            <button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
+          <div class="tech-title">DATOS TÉCNICOS</div>
+
+          <div class="tech-list">
+            <div class="tech-row">
+              <span class="tech-label">ESLORA</span>
+              <span class="tech-value">6,38 m</span>
+            </div>
+
+            <div class="tech-row">
+              <span class="tech-label">MANGA</span>
+              <span class="tech-value">2,55 m</span>
+            </div>
+
+            <div class="tech-row">
+              <span class="tech-label">PUNTAL</span>
+              <span class="tech-value">1,25 m</span>
+            </div>
+
+            <div class="tech-row">
+              <span class="tech-label">POTENCIA</span>
+              <span class="tech-value">150–250 HP</span>
+            </div>
+
+            <div class="tech-row">
+              <span class="tech-label">CAPACIDAD</span>
+              <span class="tech-value">11 PERSONAS</span>
+            </div>
           </div>
         </div>
       </div>
@@ -317,52 +355,52 @@
       applyWakeMaterial(wake3, state);
     }
 
-function nudgeBoat() {
-  const viewer = document.querySelector("#boat");
-  if (!viewer) return;
+    function nudgeBoat() {
+      const viewer = document.querySelector("#boat");
+      if (!viewer) return;
 
-  if (nudgeFrame) {
-    cancelAnimationFrame(nudgeFrame);
-    nudgeFrame = null;
-  }
+      if (nudgeFrame) {
+        cancelAnimationFrame(nudgeFrame);
+        nudgeFrame = null;
+      }
 
-  const orbit = viewer.getCameraOrbit();
-  const startTheta = Number(orbit.theta);
-  const fixedPhi = orbit.phi.toString();
-  const fixedRadius = orbit.radius.toString();
+      const orbit = viewer.getCameraOrbit();
+      const startTheta = Number(orbit.theta);
+      const fixedPhi = orbit.phi.toString();
+      const fixedRadius = orbit.radius.toString();
 
-  const nudgeRadians = 5 * Math.PI / 180;
-  const peakTheta = startTheta + nudgeRadians;
-  const endTheta = startTheta;
-  const duration = 520;
+      const nudgeRadians = 5 * Math.PI / 180;
+      const peakTheta = startTheta + nudgeRadians;
+      const endTheta = startTheta;
+      const duration = 520;
 
-  const startTime = performance.now();
+      const startTime = performance.now();
 
-  function animate(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
 
-    let theta;
-    if (progress < 0.5) {
-      const p = progress / 0.5;
-      theta = startTheta + (peakTheta - startTheta) * (1 - Math.pow(1 - p, 3));
-    } else {
-      const p = (progress - 0.5) / 0.5;
-      theta = peakTheta + (endTheta - peakTheta) * (1 - Math.pow(1 - p, 3));
-    }
+        let theta;
+        if (progress < 0.5) {
+          const p = progress / 0.5;
+          theta = startTheta + (peakTheta - startTheta) * (1 - Math.pow(1 - p, 3));
+        } else {
+          const p = (progress - 0.5) / 0.5;
+          theta = peakTheta + (endTheta - peakTheta) * (1 - Math.pow(1 - p, 3));
+        }
 
-    viewer.cameraOrbit = `${theta}rad ${fixedPhi} ${fixedRadius}`;
+        viewer.cameraOrbit = `${theta}rad ${fixedPhi} ${fixedRadius}`;
 
-    if (progress < 1) {
+        if (progress < 1) {
+          nudgeFrame = requestAnimationFrame(animate);
+        } else {
+          viewer.cameraOrbit = `${endTheta}rad ${fixedPhi} ${fixedRadius}`;
+          nudgeFrame = null;
+        }
+      }
+
       nudgeFrame = requestAnimationFrame(animate);
-    } else {
-      viewer.cameraOrbit = `${endTheta}rad ${fixedPhi} ${fixedRadius}`;
-      nudgeFrame = null;
     }
-  }
-
-  nudgeFrame = requestAnimationFrame(animate);
-}
 
     function setHull(button, color) {
       document.querySelectorAll(".exterior-swatch").forEach(btn => {
