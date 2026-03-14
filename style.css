@@ -152,6 +152,12 @@ model-viewer {
   pointer-events: none;
 }
 
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 .sidebar-toggle {
   position: absolute;
   top: 20px;
@@ -247,6 +253,86 @@ model-viewer {
   background: white;
   color: #101010;
   border-color: white;
+}
+
+.tech-specs {
+  margin-top: 6px;
+  padding: 18px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.tech-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tech-kicker {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 9px;
+  letter-spacing: 2.4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.tech-model {
+  color: white;
+  font-size: 13px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.tech-title {
+  color: white;
+  font-size: 12px;
+  letter-spacing: 3px;
+  font-weight: 750;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 14px;
+}
+
+.tech-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tech-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tech-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.tech-label {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.tech-value {
+  color: white;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  text-align: right;
+  font-family: 'Orbitron', sans-serif;
 }
 
 .top-logo-container {
@@ -599,6 +685,37 @@ model-viewer {
     letter-spacing: 1px;
   }
 
+  .tech-specs {
+    margin-top: 8px;
+    padding: 16px 14px;
+    border-radius: 16px;
+  }
+
+  .tech-header {
+    margin-bottom: 10px;
+  }
+
+  .tech-kicker {
+    font-size: 8px;
+    letter-spacing: 2px;
+  }
+
+  .tech-model {
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .tech-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .tech-label,
+  .tech-value {
+    font-size: 10px;
+  }
+
   .action-panel {
     display: flex;
     gap: 18px;
@@ -623,13 +740,13 @@ model-viewer {
     top: 18px;
     left: 50%;
     transform: translateX(-50%);
-    z-index:999998;
+    z-index: 999998;
     pointer-events: none;
   }
 
   .top-logo {
     width: 110px;
-    z-index:999998;
+    z-index: 999998;
   }
 
   .intro-logo {
