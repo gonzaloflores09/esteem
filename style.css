@@ -27,12 +27,6 @@ model-viewer {
     width: 100vw;
     height: 100vh;
 }
-body {
-    margin: 0;
-    background-color: #3d3d3d;
-    overflow: hidden;
-}
-
 .colors{
     display:flex;
     gap:12px;
@@ -166,14 +160,6 @@ body {
     color:#101010;
     border-color:white;
 }
-.esteem-logo{
-    position:absolute;
-    bottom:25px;
-    right:35px;
-    width:450px;
-    opacity:0.9;
-    pointer-events:none;
-}
 .noise{
     position:fixed;
     inset:0;
@@ -269,20 +255,17 @@ body {
     pointer-events:none;
 }
 @media (max-width: 768px){
+    .top-logo-container{
+        top:auto;
+        bottom:20px;
+        left:50%;
+        transform:translateX(-50%);
+        padding:8px 18px;
+    }
 
-.top-logo-container{
-    top:auto;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-
-    padding:8px 18px;
-}
-
-.top-logo{
-    width:120px;
-}
-
+    .top-logo{
+        width:120px;
+    }
 }
 
 
