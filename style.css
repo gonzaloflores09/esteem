@@ -268,6 +268,101 @@ model-viewer {
     opacity:0.9;
     pointer-events:none;
 }
+.quote-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999999;
+    padding:20px;
+}
+
+.quote-modal.open{
+    display:flex;
+}
+
+.quote-box{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    background:rgba(20,20,20,0.92);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:22px;
+    padding:26px 22px 22px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.45);
+}
+
+.quote-box h3{
+    margin:0 0 18px 0;
+    color:white;
+    font-size:14px;
+    letter-spacing:3px;
+    font-weight:700;
+    font-family:Arial, sans-serif;
+}
+
+#quoteForm{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+#quoteForm input,
+#quoteForm textarea{
+    width:100%;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:14px;
+    padding:12px 14px;
+    color:white;
+    font-size:13px;
+    font-family:Arial, sans-serif;
+    outline:none;
+    box-sizing:border-box;
+}
+
+#quoteForm textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+#quoteForm input::placeholder,
+#quoteForm textarea::placeholder{
+    color:rgba(255,255,255,0.55);
+}
+
+.quote-close{
+    position:absolute;
+    top:10px;
+    right:12px;
+    background:none;
+    border:none;
+    color:white;
+    font-size:24px;
+    cursor:pointer;
+    opacity:0.75;
+}
+
+.quote-close:hover{
+    opacity:1;
+}
+
+.quote-success{
+    display:none;
+    margin-top:14px;
+    color:#2ecc71;
+    font-size:13px;
+    letter-spacing:1px;
+    font-family:Arial, sans-serif;
+}
+
+.quote-success.show{
+    display:block;
+}
 @media (max-width: 768px){
     .top-logo-container{
         top:auto;
