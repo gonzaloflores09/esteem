@@ -24,26 +24,26 @@
       <span class="toggle-icon">‹</span>
     </button>
 
-    <div class="sidebar-inner">
+    <div class="sidebar-inner" id="sidebarInner">
       <div class="sidebar-content">
         <div class="panel">
           <div class="section">
             <h2 class="section-title">COLOR EXTERIOR</h2>
             <div class="colors">
-              <button class="swatch exterior-swatch black" onclick="setHull(this, '#0b0b0b')"></button>
-              <button class="swatch exterior-swatch grey active" onclick="setHull(this, '#141414')"></button>
-              <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1')"></button>
-              <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000')"></button>
+              <button class="swatch exterior-swatch black" onclick="setHull(this, '#0b0b0b', 'Negro')"></button>
+              <button class="swatch exterior-swatch grey active" onclick="setHull(this, '#141414', 'Gris')"></button>
+              <button class="swatch exterior-swatch white" onclick="setHull(this, '#f1f1f1', 'Blanco')"></button>
+              <button class="swatch exterior-swatch red" onclick="setHull(this, '#ff0000', 'Rojo')"></button>
             </div>
           </div>
 
           <div class="section">
             <div class="section-title">COLOR INTERIOR</div>
             <div class="colors">
-              <button class="swatch interior-swatch black" onclick="setInterior(this, '#101010')"></button>
-              <button class="swatch interior-swatch grey" onclick="setInterior(this, '#3f3f3f')"></button>
-              <button class="swatch interior-swatch white active" onclick="setInterior(this, '#f1f1f1')"></button>
-              <button class="swatch interior-swatch caramel" onclick="setInterior(this, '#c68642')"></button>
+              <button class="swatch interior-swatch black" onclick="setInterior(this, '#101010', 'Negro')"></button>
+              <button class="swatch interior-swatch grey" onclick="setInterior(this, '#3f3f3f', 'Gris')"></button>
+              <button class="swatch interior-swatch white active" onclick="setInterior(this, '#f1f1f1', 'Blanco')"></button>
+              <button class="swatch interior-swatch caramel" onclick="setInterior(this, '#c68642', 'Caramelo')"></button>
             </div>
           </div>
 
@@ -91,13 +91,50 @@
             </div>
           </div>
         </div>
+
+        <!-- NUEVO BLOQUE DE PRECIO -->
+        <div class="price-card">
+          <div class="price-card-top">
+            <div class="price-kicker">CONFIGURACIÓN</div>
+            <div class="price-note">PRECIO ESTIMADO</div>
+          </div>
+
+          <div class="price-total-wrap">
+            <div class="price-currency">USD</div>
+            <div class="price-total" id="priceTotal">$45.000</div>
+          </div>
+
+          <div class="price-divider"></div>
+
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span class="price-label">BASE Z1</span>
+              <span class="price-value" id="priceBase">$45.000</span>
+            </div>
+
+            <div class="price-row">
+              <span class="price-label">EXTERIOR <span id="selectedExteriorLabel">GRIS</span></span>
+              <span class="price-value" id="priceExterior">$0</span>
+            </div>
+
+            <div class="price-row">
+              <span class="price-label">INTERIOR <span id="selectedInteriorLabel">BLANCO</span></span>
+              <span class="price-value" id="priceInterior">$0</span>
+            </div>
+
+            <div class="price-row">
+              <span class="price-label">WAKE TOWER <span id="selectedWakeLabel">SÍ</span></span>
+              <span class="price-value" id="priceWake">$3.500</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="action-panel">
         <div class="action-block">
-          <div class="action-title">GUARDAR CONFIGURACIÓN</div>
-          <button id="copyBtn" class="action-btn" onclick="copyConfigLink()">
-            COPIAR LINK
+          <div class="action-title">DESCARGAR IMAGEN</div>
+          <button class="action-btn" onclick="captureBoatImage()">
+            CAPTURAR DISEÑO
           </button>
         </div>
 
@@ -108,28 +145,44 @@
           </button>
         </div>
 
-        <div class="action-block">
-          <div class="action-title">DESCARGAR IMAGEN</div>
-          <button class="action-btn" onclick="captureBoatImage()">
-            CAPTURAR DISEÑO
-          </button>
+        <div class="action-block social-block">
+          <div class="social-links">
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram Esteem">
+              <img src="instagram1.png.png" class="social-icon" alt="Instagram">
+            </a>
+
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook Esteem">
+              <img src="facebook.png" class="social-icon" alt="Facebook">
+            </a>
+
+            <a href="https://ar.linkedin.com/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn Esteem">
+              <img src="linkedin.png" class="social-icon social-icon-linkedin" alt="LinkedIn">
+            </a>
+          </div>
         </div>
+      </div>
+
+      <div class="mobile-scroll-hint" id="mobileScrollHint" aria-hidden="true">
+        <span class="scroll-hint-arrow">↓</span>
+        <span class="scroll-hint-text">DESLIZÁ PARA VER MÁS</span>
       </div>
     </div>
   </div>
 
-  <model-viewer
-    id="boat"
-    src="Z1_WEB_V5.glb"
-    alt="Lancha"
-    shadow-intensity="1.5"
-    exposure="0.6"
-    shadow-softness="0.8"
-    camera-controls
-    camera-orbit="90deg 75deg 3m"
-    max-camera-orbit="auto 87deg auto"
-    style="width:100vw; height:100vh;"
-  ></model-viewer>
+  <div class="viewer-stage">
+    <model-viewer
+      id="boat"
+      src="Z1_WEB_V5.glb"
+      alt="Lancha"
+      shadow-intensity="1.5"
+      exposure="0.6"
+      shadow-softness="0.8"
+      camera-controls
+      camera-orbit="90deg 75deg 6.2m"
+      field-of-view="35deg"
+      max-camera-orbit="auto 87deg auto">
+    </model-viewer>
+  </div>
 
   <div id="quoteModal" class="quote-modal">
     <div class="quote-box">
@@ -145,6 +198,8 @@
         <input type="hidden" name="color_interior" id="quoteInterior">
         <input type="hidden" name="wake_tower" id="quoteWake">
         <input type="hidden" name="link_configuracion" id="quoteConfigLink">
+        <input type="hidden" name="precio_total" id="quotePrice">
+        <input type="hidden" name="resumen_configuracion" id="quoteSummary">
 
         <button type="submit" class="toggle-btn">ENVIAR SOLICITUD</button>
       </form>
@@ -154,6 +209,7 @@
   </div>
 
   <div id="colorFade"></div>
+
   <div class="vignette"></div>
   <div class="noise"></div>
 
@@ -164,6 +220,102 @@
     let currentInteriorColor = "#f1f1f1";
     let currentWakeState = true;
     let nudgeFrame = null;
+
+    let currentHullLabel = "Gris";
+    let currentInteriorLabel = "Blanco";
+
+    const INITIAL_CAMERA_THETA = "90deg";
+    const INITIAL_CAMERA_PHI = "75deg";
+    const INITIAL_CAMERA_RADIUS = "9m";
+    const INITIAL_CAMERA_ORBIT = `${INITIAL_CAMERA_THETA} ${INITIAL_CAMERA_PHI} ${INITIAL_CAMERA_RADIUS}`;
+
+    /* =========================
+       PRECIOS EDITABLES
+       CAMBIÁ ESTOS VALORES
+    ========================= */
+    const pricing = {
+      basePrice: 39990,
+      exterior: {
+        "Negro": 0,
+        "Gris": 0,
+        "Blanco": 1200,
+        "Rojo": 2400
+      },
+      interior: {
+        "Negro": 0,
+        "Gris": 500,
+        "Blanco": 0,
+        "Caramelo": 1800
+      },
+      wakeTower: {
+        true: 3500,
+        false: 0
+      }
+    };
+
+    function formatPrice(value) {
+      return new Intl.NumberFormat("es-AR", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    function updatePriceUI() {
+      const base = pricing.basePrice;
+      const exteriorExtra = pricing.exterior[currentHullLabel] ?? 0;
+      const interiorExtra = pricing.interior[currentInteriorLabel] ?? 0;
+      const wakeExtra = pricing.wakeTower[currentWakeState] ?? 0;
+      const total = base + exteriorExtra + interiorExtra + wakeExtra;
+
+      const baseEl = document.getElementById("priceBase");
+      const exteriorEl = document.getElementById("priceExterior");
+      const interiorEl = document.getElementById("priceInterior");
+      const wakeEl = document.getElementById("priceWake");
+      const totalEl = document.getElementById("priceTotal");
+
+      const extLabelEl = document.getElementById("selectedExteriorLabel");
+      const intLabelEl = document.getElementById("selectedInteriorLabel");
+      const wakeLabelEl = document.getElementById("selectedWakeLabel");
+
+      if (baseEl) baseEl.textContent = formatPrice(base);
+      if (exteriorEl) exteriorEl.textContent = exteriorExtra === 0 ? "$0" : `+ ${formatPrice(exteriorExtra)}`;
+      if (interiorEl) interiorEl.textContent = interiorExtra === 0 ? "$0" : `+ ${formatPrice(interiorExtra)}`;
+      if (wakeEl) wakeEl.textContent = wakeExtra === 0 ? "$0" : `+ ${formatPrice(wakeExtra)}`;
+      if (totalEl) totalEl.textContent = formatPrice(total);
+
+      if (extLabelEl) extLabelEl.textContent = currentHullLabel.toUpperCase();
+      if (intLabelEl) intLabelEl.textContent = currentInteriorLabel.toUpperCase();
+      if (wakeLabelEl) wakeLabelEl.textContent = currentWakeState ? "SÍ" : "NO";
+    }
+
+    function getConfigurationSummary() {
+      const base = pricing.basePrice;
+      const exteriorExtra = pricing.exterior[currentHullLabel] ?? 0;
+      const interiorExtra = pricing.interior[currentInteriorLabel] ?? 0;
+      const wakeExtra = pricing.wakeTower[currentWakeState] ?? 0;
+      const total = base + exteriorExtra + interiorExtra + wakeExtra;
+
+      return `
+Modelo: Z1
+Color exterior: ${currentHullLabel}
+Color interior: ${currentInteriorLabel}
+Wake tower: ${currentWakeState ? "Sí" : "No"}
+Precio base: ${formatPrice(base)}
+Extra exterior: ${formatPrice(exteriorExtra)}
+Extra interior: ${formatPrice(interiorExtra)}
+Extra wake tower: ${formatPrice(wakeExtra)}
+Precio total: ${formatPrice(total)}
+      `.trim();
+    }
+
+    function getCurrentTotalPrice() {
+      const base = pricing.basePrice;
+      const exteriorExtra = pricing.exterior[currentHullLabel] ?? 0;
+      const interiorExtra = pricing.interior[currentInteriorLabel] ?? 0;
+      const wakeExtra = pricing.wakeTower[currentWakeState] ?? 0;
+      return base + exteriorExtra + interiorExtra + wakeExtra;
+    }
 
     function updateConfigURL() {
       const params = new URLSearchParams();
@@ -185,19 +337,16 @@
       if (exterior) currentHullColor = `#${exterior}`;
       if (interior) currentInteriorColor = `#${interior}`;
       if (wake) currentWakeState = wake === "on";
-    }
 
-    function copyConfigLink() {
-      navigator.clipboard.writeText(window.location.href);
+      if (currentHullColor === "#0b0b0b") currentHullLabel = "Negro";
+      if (currentHullColor === "#141414") currentHullLabel = "Gris";
+      if (currentHullColor === "#f1f1f1") currentHullLabel = "Blanco";
+      if (currentHullColor === "#ff0000") currentHullLabel = "Rojo";
 
-      const btn = document.getElementById("copyBtn");
-      btn.innerHTML = "✓ LINK COPIADO";
-      btn.classList.add("copy-success");
-
-      setTimeout(() => {
-        btn.innerHTML = "COPIAR LINK";
-        btn.classList.remove("copy-success");
-      }, 2000);
+      if (currentInteriorColor === "#101010") currentInteriorLabel = "Negro";
+      if (currentInteriorColor === "#3f3f3f") currentInteriorLabel = "Gris";
+      if (currentInteriorColor === "#f1f1f1") currentInteriorLabel = "Blanco";
+      if (currentInteriorColor === "#c68642") currentInteriorLabel = "Caramelo";
     }
 
     function openQuoteModal() {
@@ -205,6 +354,8 @@
       document.getElementById("quoteInterior").value = currentInteriorColor;
       document.getElementById("quoteWake").value = currentWakeState ? "ON" : "OFF";
       document.getElementById("quoteConfigLink").value = window.location.href;
+      document.getElementById("quotePrice").value = formatPrice(getCurrentTotalPrice());
+      document.getElementById("quoteSummary").value = getConfigurationSummary();
 
       document.getElementById("quoteModal").classList.add("open");
     }
@@ -221,6 +372,9 @@
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
+        document.getElementById("quotePrice").value = formatPrice(getCurrentTotalPrice());
+        document.getElementById("quoteSummary").value = getConfigurationSummary();
 
         const data = new FormData(form);
 
@@ -402,30 +556,34 @@
       nudgeFrame = requestAnimationFrame(animate);
     }
 
-    function setHull(button, color) {
+    function setHull(button, color, label) {
       document.querySelectorAll(".exterior-swatch").forEach(btn => {
         btn.classList.remove("active");
       });
 
       button.classList.add("active");
       currentHullColor = color;
+      currentHullLabel = label;
 
       animateColorChange(color, changeHull);
       nudgeBoat();
       updateConfigURL();
+      updatePriceUI();
     }
 
-    function setInterior(button, color) {
+    function setInterior(button, color, label) {
       document.querySelectorAll(".interior-swatch").forEach(btn => {
         btn.classList.remove("active");
       });
 
       button.classList.add("active");
       currentInteriorColor = color;
+      currentInteriorLabel = label;
 
       animateColorChange(color, changeInterior);
       nudgeBoat();
       updateConfigURL();
+      updatePriceUI();
     }
 
     function setWake(state) {
@@ -446,6 +604,7 @@
       animateColorChange("#000", () => {});
       nudgeBoat();
       updateConfigURL();
+      updatePriceUI();
     }
 
     function applySavedConfig() {
@@ -479,17 +638,21 @@
         offBtn.classList.add("active");
         onBtn.classList.remove("active");
       }
+
+      updatePriceUI();
     }
 
     function spinBoatOnce() {
       const viewer = document.querySelector("#boat");
+      if (!viewer) return;
+
+      const orbit = viewer.getCameraOrbit();
+      const currentRadius = orbit.radius.toString();
+      const currentPhi = orbit.phi.toString();
 
       const startAngle = 90;
-      const endAngle = 330;
-      const vertical = 75;
-      const radius = "3m";
+      const endAngle = 450;
       const duration = 2500;
-
       const startTime = performance.now();
 
       function animate(now) {
@@ -498,10 +661,12 @@
         const eased = 1 - Math.pow(1 - progress, 3);
 
         const angle = startAngle + (endAngle - startAngle) * eased;
-        viewer.cameraOrbit = `${angle}deg ${vertical}deg ${radius}`;
+        viewer.cameraOrbit = `${angle}deg ${currentPhi} ${currentRadius}`;
 
         if (progress < 1) {
           requestAnimationFrame(animate);
+        } else {
+          viewer.cameraOrbit = `${INITIAL_CAMERA_THETA} ${INITIAL_CAMERA_PHI} ${INITIAL_CAMERA_RADIUS}`;
         }
       }
 
@@ -545,7 +710,52 @@
 
       toggle.addEventListener("click", () => {
         sidebar.classList.toggle("collapsed");
+        document.body.classList.toggle("sidebar-collapsed");
+
+        setTimeout(() => {
+          const viewer = document.getElementById("boat");
+          if (viewer && typeof viewer.jumpCameraToGoal === "function") {
+            viewer.jumpCameraToGoal();
+          }
+        }, 460);
       });
+    }
+
+    function setupMobileScrollHint() {
+      const sidebarInner = document.getElementById("sidebarInner");
+      const hint = document.getElementById("mobileScrollHint");
+      const sidebar = document.getElementById("sidebar");
+
+      if (!sidebarInner || !hint || !sidebar) return;
+
+      const mobileQuery = window.matchMedia("(max-width: 768px)");
+
+      function evaluateHint() {
+        const isMobile = mobileQuery.matches;
+        const isCollapsed = sidebar.classList.contains("collapsed");
+        const canScroll = sidebarInner.scrollHeight > sidebarInner.clientHeight + 8;
+        const isScrolled = sidebarInner.scrollTop > 16;
+
+        if (!isMobile || isCollapsed || !canScroll || isScrolled) {
+          hint.classList.remove("show");
+        } else {
+          hint.classList.add("show");
+        }
+      }
+
+      sidebarInner.addEventListener("scroll", evaluateHint);
+      window.addEventListener("resize", evaluateHint);
+
+      const toggle = document.getElementById("sidebarToggle");
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          setTimeout(evaluateHint, 500);
+        });
+      }
+
+      setTimeout(evaluateHint, 400);
+      setTimeout(evaluateHint, 1200);
+      setTimeout(evaluateHint, 2200);
     }
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -554,9 +764,13 @@
 
       if (!viewer || !intro) return;
 
+      document.body.classList.remove("sidebar-collapsed");
+
       loadConfigFromURL();
       setupQuoteForm();
       setupSidebarToggle();
+      setupMobileScrollHint();
+      updatePriceUI();
 
       const hideIntro = () => {
         const introOverlay = document.querySelector(".intro-overlay");
@@ -577,6 +791,12 @@
       viewer.addEventListener("load", () => {
         applySavedConfig();
         hideIntro();
+
+        viewer.cameraOrbit = INITIAL_CAMERA_ORBIT;
+
+        if (typeof viewer.jumpCameraToGoal === "function") {
+          viewer.jumpCameraToGoal();
+        }
 
         setTimeout(() => {
           spinBoatOnce();
