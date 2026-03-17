@@ -48,11 +48,8 @@
           </div>
 
           <div class="section">
-            <div class="section-title">WAKE TOWER</div>
-            <div class="toggle-group">
-              <button class="toggle-btn active" id="wake-on" onclick="setWake(true)">SÍ</button>
-              <button class="toggle-btn" id="wake-off" onclick="setWake(false)">NO</button>
-            </div>
+            <div class="section-title">EXTRAS</div>
+            <div class="extras-list" id="extrasList"></div>
           </div>
         </div>
 
@@ -92,7 +89,6 @@
           </div>
         </div>
 
-        <!-- NUEVO BLOQUE DE PRECIO -->
         <div class="price-card">
           <div class="price-card-top">
             <div class="price-kicker">CONFIGURACIÓN</div>
@@ -101,7 +97,7 @@
 
           <div class="price-total-wrap">
             <div class="price-currency">USD</div>
-            <div class="price-total" id="priceTotal">$45.000</div>
+            <div class="price-total" id="priceTotal">$39.990</div>
           </div>
 
           <div class="price-divider"></div>
@@ -109,7 +105,7 @@
           <div class="price-breakdown">
             <div class="price-row">
               <span class="price-label">BASE Z1</span>
-              <span class="price-value" id="priceBase">$45.000</span>
+              <span class="price-value" id="priceBase">$39.990</span>
             </div>
 
             <div class="price-row">
@@ -122,10 +118,7 @@
               <span class="price-value" id="priceInterior">$0</span>
             </div>
 
-            <div class="price-row">
-              <span class="price-label">WAKE TOWER <span id="selectedWakeLabel">SÍ</span></span>
-              <span class="price-value" id="priceWake">$3.500</span>
-            </div>
+            <div class="price-extras-list" id="priceExtrasList"></div>
           </div>
         </div>
       </div>
@@ -174,12 +167,18 @@
       id="boat"
       src="Z1_WEB_V5.glb"
       alt="Lancha"
-      shadow-intensity="1.5"
-      exposure="0.6"
-      shadow-softness="0.8"
       camera-controls
-      camera-orbit="90deg 75deg 6.2m"
+      disable-pan
+      interaction-prompt="none"
+      loading="eager"
+      reveal="auto"
+      shadow-intensity="0.7"
+      shadow-softness="0.45"
+      exposure="0.78"
+      environment-image="neutral"
+      camera-orbit="90deg 75deg 9m"
       field-of-view="35deg"
+      min-camera-orbit="auto 55deg auto"
       max-camera-orbit="auto 87deg auto">
     </model-viewer>
   </div>
@@ -196,7 +195,7 @@
 
         <input type="hidden" name="color_exterior" id="quoteExterior">
         <input type="hidden" name="color_interior" id="quoteInterior">
-        <input type="hidden" name="wake_tower" id="quoteWake">
+        <input type="hidden" name="extras" id="quoteExtras">
         <input type="hidden" name="link_configuracion" id="quoteConfigLink">
         <input type="hidden" name="precio_total" id="quotePrice">
         <input type="hidden" name="resumen_configuracion" id="quoteSummary">
@@ -218,23 +217,22 @@
   <script>
     let currentHullColor = "#141414";
     let currentInteriorColor = "#f1f1f1";
-    let currentWakeState = true;
     let nudgeFrame = null;
+    let spinFrame = null;
 
     let currentHullLabel = "Gris";
     let currentInteriorLabel = "Blanco";
+
+    const viewer = document.getElementById("boat");
 
     const INITIAL_CAMERA_THETA = "90deg";
     const INITIAL_CAMERA_PHI = "75deg";
     const INITIAL_CAMERA_RADIUS = "9m";
     const INITIAL_CAMERA_ORBIT = `${INITIAL_CAMERA_THETA} ${INITIAL_CAMERA_PHI} ${INITIAL_CAMERA_RADIUS}`;
 
-    /* =========================
-       PRECIOS EDITABLES
-       CAMBIÁ ESTOS VALORES
-    ========================= */
+    const BASE_PRICE = 39990;
+
     const pricing = {
-      basePrice: 39990,
       exterior: {
         "Negro": 0,
         "Gris": 0,
@@ -246,12 +244,115 @@
         "Gris": 500,
         "Blanco": 0,
         "Caramelo": 1800
-      },
-      wakeTower: {
-        true: 3500,
-        false: 0
       }
     };
+
+    const extrasCatalog = {
+      trailer: {
+        label: "Trailer",
+        price: 3600,
+        selected: false
+      },
+      cover: {
+        label: "Cobertor intemperie",
+        price: 528,
+        selected: false
+      },
+      wakeBimini: {
+        label: "Torre wake c/bimini",
+        price: 1667,
+        selected: false
+      },
+      screen: {
+        label: "Pantalla",
+        price: 1800,
+        selected: false
+      },
+      motor250: {
+        label: "Motor 250HP",
+        price: 0,
+        selected: false,
+        customText: "CONSULTAR"
+      }
+    };
+
+    const materialCache = {
+      hull: null,
+      interiors: [],
+      wake: []
+    };
+
+    const dom = {
+      priceBase: null,
+      priceExterior: null,
+      priceInterior: null,
+      priceTotal: null,
+      selectedExteriorLabel: null,
+      selectedInteriorLabel: null,
+      priceExtrasList: null,
+      extrasList: null,
+      quoteModal: null,
+      quoteForm: null,
+      quoteSuccess: null,
+      quoteExterior: null,
+      quoteInterior: null,
+      quoteExtras: null,
+      quoteConfigLink: null,
+      quotePrice: null,
+      quoteSummary: null,
+      colorFade: null,
+      intro: null,
+      sidebar: null,
+      sidebarToggle: null,
+      sidebarInner: null,
+      mobileScrollHint: null
+    };
+
+    function cacheDom() {
+      dom.priceBase = document.getElementById("priceBase");
+      dom.priceExterior = document.getElementById("priceExterior");
+      dom.priceInterior = document.getElementById("priceInterior");
+      dom.priceTotal = document.getElementById("priceTotal");
+      dom.selectedExteriorLabel = document.getElementById("selectedExteriorLabel");
+      dom.selectedInteriorLabel = document.getElementById("selectedInteriorLabel");
+      dom.priceExtrasList = document.getElementById("priceExtrasList");
+      dom.extrasList = document.getElementById("extrasList");
+      dom.quoteModal = document.getElementById("quoteModal");
+      dom.quoteForm = document.getElementById("quoteForm");
+      dom.quoteSuccess = document.getElementById("quoteSuccess");
+      dom.quoteExterior = document.getElementById("quoteExterior");
+      dom.quoteInterior = document.getElementById("quoteInterior");
+      dom.quoteExtras = document.getElementById("quoteExtras");
+      dom.quoteConfigLink = document.getElementById("quoteConfigLink");
+      dom.quotePrice = document.getElementById("quotePrice");
+      dom.quoteSummary = document.getElementById("quoteSummary");
+      dom.colorFade = document.getElementById("colorFade");
+      dom.intro = document.getElementById("intro");
+      dom.sidebar = document.getElementById("sidebar");
+      dom.sidebarToggle = document.getElementById("sidebarToggle");
+      dom.sidebarInner = document.getElementById("sidebarInner");
+      dom.mobileScrollHint = document.getElementById("mobileScrollHint");
+    }
+
+    function cacheMaterials() {
+      if (!viewer || !viewer.model) return;
+
+      const materials = viewer.model.materials || [];
+
+      materialCache.hull = materials.find(m => m.name === "Material.004") || null;
+
+      materialCache.interiors = materials.filter(m =>
+        m.name === "Phong_737373_r0.90" ||
+        m.name === "Standard_3A3A3A" ||
+        m.name === "Phong_414141_r0.90"
+      );
+
+      materialCache.wake = materials.filter(m =>
+        m.name === "Standard_373737" ||
+        m.name === "Material.005" ||
+        m.name === "Material.006"
+      );
+    }
 
     function formatPrice(value) {
       return new Intl.NumberFormat("es-AR", {
@@ -261,67 +362,120 @@
       }).format(value);
     }
 
+    function isWakeSelected() {
+      return !!extrasCatalog.wakeBimini.selected;
+    }
+
+    function getSelectedExtrasTotal() {
+      let total = 0;
+
+      Object.values(extrasCatalog).forEach(extra => {
+        if (extra.selected) {
+          total += extra.price;
+        }
+      });
+
+      return total;
+    }
+
+    function getPricingState() {
+      const base = BASE_PRICE;
+      const exteriorExtra = pricing.exterior[currentHullLabel] ?? 0;
+      const interiorExtra = pricing.interior[currentInteriorLabel] ?? 0;
+      const extrasTotal = getSelectedExtrasTotal();
+      const total = base + exteriorExtra + interiorExtra + extrasTotal;
+
+      return { base, exteriorExtra, interiorExtra, extrasTotal, total };
+    }
+
+    function getSelectedExtrasArray() {
+      return Object.entries(extrasCatalog)
+        .filter(([, extra]) => extra.selected)
+        .map(([key]) => key);
+    }
+
+    function getSelectedExtrasSummary() {
+      const lines = [];
+
+      Object.values(extrasCatalog).forEach(extra => {
+        if (extra.selected) {
+          lines.push(`- ${extra.label}: ${extra.customText ? extra.customText : formatPrice(extra.price)}`);
+        }
+      });
+
+      return lines.join("\n");
+    }
+
+    function updateExtrasBreakdown() {
+      if (!dom.priceExtrasList) return;
+
+      dom.priceExtrasList.innerHTML = "";
+
+      Object.values(extrasCatalog).forEach(extra => {
+        if (extra.selected) {
+          const row = document.createElement("div");
+          row.className = "price-row";
+          row.innerHTML = `
+            <span class="price-label">${extra.label.toUpperCase()}</span>
+            <span class="price-value">
+              ${extra.customText ? extra.customText : `+ ${formatPrice(extra.price)}`}
+            </span>
+          `;
+          dom.priceExtrasList.appendChild(row);
+        }
+      });
+    }
+
     function updatePriceUI() {
-      const base = pricing.basePrice;
-      const exteriorExtra = pricing.exterior[currentHullLabel] ?? 0;
-      const interiorExtra = pricing.interior[currentInteriorLabel] ?? 0;
-      const wakeExtra = pricing.wakeTower[currentWakeState] ?? 0;
-      const total = base + exteriorExtra + interiorExtra + wakeExtra;
+      const { base, exteriorExtra, interiorExtra, total } = getPricingState();
 
-      const baseEl = document.getElementById("priceBase");
-      const exteriorEl = document.getElementById("priceExterior");
-      const interiorEl = document.getElementById("priceInterior");
-      const wakeEl = document.getElementById("priceWake");
-      const totalEl = document.getElementById("priceTotal");
+      if (dom.priceBase) dom.priceBase.textContent = formatPrice(base);
+      if (dom.priceExterior) dom.priceExterior.textContent = exteriorExtra === 0 ? "$0" : `+ ${formatPrice(exteriorExtra)}`;
+      if (dom.priceInterior) dom.priceInterior.textContent = interiorExtra === 0 ? "$0" : `+ ${formatPrice(interiorExtra)}`;
+      if (dom.priceTotal) dom.priceTotal.textContent = formatPrice(total);
 
-      const extLabelEl = document.getElementById("selectedExteriorLabel");
-      const intLabelEl = document.getElementById("selectedInteriorLabel");
-      const wakeLabelEl = document.getElementById("selectedWakeLabel");
+      if (dom.selectedExteriorLabel) dom.selectedExteriorLabel.textContent = currentHullLabel.toUpperCase();
+      if (dom.selectedInteriorLabel) dom.selectedInteriorLabel.textContent = currentInteriorLabel.toUpperCase();
 
-      if (baseEl) baseEl.textContent = formatPrice(base);
-      if (exteriorEl) exteriorEl.textContent = exteriorExtra === 0 ? "$0" : `+ ${formatPrice(exteriorExtra)}`;
-      if (interiorEl) interiorEl.textContent = interiorExtra === 0 ? "$0" : `+ ${formatPrice(interiorExtra)}`;
-      if (wakeEl) wakeEl.textContent = wakeExtra === 0 ? "$0" : `+ ${formatPrice(wakeExtra)}`;
-      if (totalEl) totalEl.textContent = formatPrice(total);
-
-      if (extLabelEl) extLabelEl.textContent = currentHullLabel.toUpperCase();
-      if (intLabelEl) intLabelEl.textContent = currentInteriorLabel.toUpperCase();
-      if (wakeLabelEl) wakeLabelEl.textContent = currentWakeState ? "SÍ" : "NO";
+      updateExtrasBreakdown();
     }
 
-    function getConfigurationSummary() {
-      const base = pricing.basePrice;
-      const exteriorExtra = pricing.exterior[currentHullLabel] ?? 0;
-      const interiorExtra = pricing.interior[currentInteriorLabel] ?? 0;
-      const wakeExtra = pricing.wakeTower[currentWakeState] ?? 0;
-      const total = base + exteriorExtra + interiorExtra + wakeExtra;
+    function renderExtras() {
+      if (!dom.extrasList) return;
 
-      return `
-Modelo: Z1
-Color exterior: ${currentHullLabel}
-Color interior: ${currentInteriorLabel}
-Wake tower: ${currentWakeState ? "Sí" : "No"}
-Precio base: ${formatPrice(base)}
-Extra exterior: ${formatPrice(exteriorExtra)}
-Extra interior: ${formatPrice(interiorExtra)}
-Extra wake tower: ${formatPrice(wakeExtra)}
-Precio total: ${formatPrice(total)}
-      `.trim();
-    }
+      dom.extrasList.innerHTML = "";
 
-    function getCurrentTotalPrice() {
-      const base = pricing.basePrice;
-      const exteriorExtra = pricing.exterior[currentHullLabel] ?? 0;
-      const interiorExtra = pricing.interior[currentInteriorLabel] ?? 0;
-      const wakeExtra = pricing.wakeTower[currentWakeState] ?? 0;
-      return base + exteriorExtra + interiorExtra + wakeExtra;
+      Object.entries(extrasCatalog).forEach(([key, extra]) => {
+        const row = document.createElement("label");
+        row.className = "extra-item";
+
+        row.innerHTML = `
+          <div class="extra-item-left">
+            <input
+              type="checkbox"
+              ${extra.selected ? "checked" : ""}
+              onchange="toggleExtra('${key}', this.checked)"
+            >
+            <span class="extra-name">${extra.label}</span>
+          </div>
+          <div class="extra-price">
+            ${extra.customText ? extra.customText : `+ ${formatPrice(extra.price)}`}
+          </div>
+        `;
+
+        dom.extrasList.appendChild(row);
+      });
     }
 
     function updateConfigURL() {
       const params = new URLSearchParams();
       params.set("exterior", currentHullColor.replace("#", ""));
       params.set("interior", currentInteriorColor.replace("#", ""));
-      params.set("wake", currentWakeState ? "on" : "off");
+
+      const selectedExtras = getSelectedExtrasArray();
+      if (selectedExtras.length) {
+        params.set("extras", selectedExtras.join(","));
+      }
 
       const newURL = `${window.location.pathname}?${params.toString()}`;
       window.history.replaceState({}, "", newURL);
@@ -332,11 +486,10 @@ Precio total: ${formatPrice(total)}
 
       const exterior = params.get("exterior");
       const interior = params.get("interior");
-      const wake = params.get("wake");
+      const extras = params.get("extras");
 
       if (exterior) currentHullColor = `#${exterior}`;
       if (interior) currentInteriorColor = `#${interior}`;
-      if (wake) currentWakeState = wake === "on";
 
       if (currentHullColor === "#0b0b0b") currentHullLabel = "Negro";
       if (currentHullColor === "#141414") currentHullLabel = "Gris";
@@ -347,39 +500,65 @@ Precio total: ${formatPrice(total)}
       if (currentInteriorColor === "#3f3f3f") currentInteriorLabel = "Gris";
       if (currentInteriorColor === "#f1f1f1") currentInteriorLabel = "Blanco";
       if (currentInteriorColor === "#c68642") currentInteriorLabel = "Caramelo";
+
+      if (extras) {
+        const selected = extras.split(",");
+        Object.entries(extrasCatalog).forEach(([key, extra]) => {
+          extra.selected = selected.includes(key);
+        });
+      }
+    }
+
+    function getConfigurationSummary() {
+      const { base, exteriorExtra, interiorExtra, total } = getPricingState();
+
+      return `
+Modelo: Z1
+Color exterior: ${currentHullLabel}
+Color interior: ${currentInteriorLabel}
+Wake tower con bimini: ${isWakeSelected() ? "Sí" : "No"}
+Extras:
+${getSelectedExtrasSummary() || "- Ninguno"}
+Precio base: ${formatPrice(base)}
+Extra exterior: ${formatPrice(exteriorExtra)}
+Extra interior: ${formatPrice(interiorExtra)}
+Precio total: ${formatPrice(total)}
+      `.trim();
+    }
+
+    function getCurrentTotalPrice() {
+      return getPricingState().total;
     }
 
     function openQuoteModal() {
-      document.getElementById("quoteExterior").value = currentHullColor;
-      document.getElementById("quoteInterior").value = currentInteriorColor;
-      document.getElementById("quoteWake").value = currentWakeState ? "ON" : "OFF";
-      document.getElementById("quoteConfigLink").value = window.location.href;
-      document.getElementById("quotePrice").value = formatPrice(getCurrentTotalPrice());
-      document.getElementById("quoteSummary").value = getConfigurationSummary();
+      dom.quoteExterior.value = currentHullColor;
+      dom.quoteInterior.value = currentInteriorColor;
+      dom.quoteExtras.value = getSelectedExtrasSummary() || "Ninguno";
+      dom.quoteConfigLink.value = window.location.href;
+      dom.quotePrice.value = formatPrice(getCurrentTotalPrice());
+      dom.quoteSummary.value = getConfigurationSummary();
 
-      document.getElementById("quoteModal").classList.add("open");
+      dom.quoteModal.classList.add("open");
     }
 
     function closeQuoteModal() {
-      document.getElementById("quoteModal").classList.remove("open");
+      dom.quoteModal.classList.remove("open");
     }
 
     function setupQuoteForm() {
-      const form = document.getElementById("quoteForm");
-      const success = document.getElementById("quoteSuccess");
+      if (!dom.quoteForm) return;
 
-      if (!form) return;
-
-      form.addEventListener("submit", async (e) => {
+      dom.quoteForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        document.getElementById("quotePrice").value = formatPrice(getCurrentTotalPrice());
-        document.getElementById("quoteSummary").value = getConfigurationSummary();
+        dom.quotePrice.value = formatPrice(getCurrentTotalPrice());
+        dom.quoteExtras.value = getSelectedExtrasSummary() || "Ninguno";
+        dom.quoteSummary.value = getConfigurationSummary();
 
-        const data = new FormData(form);
+        const data = new FormData(dom.quoteForm);
 
         try {
-          const response = await fetch(form.action, {
+          const response = await fetch(dom.quoteForm.action, {
             method: "POST",
             body: data,
             headers: {
@@ -390,11 +569,11 @@ Precio total: ${formatPrice(total)}
           const result = await response.json();
 
           if (response.ok) {
-            form.reset();
-            success.classList.add("show");
+            dom.quoteForm.reset();
+            dom.quoteSuccess.classList.add("show");
 
             setTimeout(() => {
-              success.classList.remove("show");
+              dom.quoteSuccess.classList.remove("show");
               closeQuoteModal();
             }, 1800);
           } else {
@@ -415,51 +594,31 @@ Precio total: ${formatPrice(total)}
     }
 
     function changeHull(color) {
-      const viewer = document.querySelector("#boat");
-      if (!viewer.model) return;
-
-      const hullMaterial = viewer.model.materials.find(
-        m => m.name === "Material.004"
-      );
-      if (!hullMaterial) return;
-
-      hullMaterial.pbrMetallicRoughness.setBaseColorFactor(hexToRgbFactor(color));
+      if (!materialCache.hull) return;
+      materialCache.hull.pbrMetallicRoughness.setBaseColorFactor(hexToRgbFactor(color));
     }
 
     function changeInterior(color) {
-      const viewer = document.querySelector("#boat");
-      if (!viewer.model) return;
-
-      const interior1 = viewer.model.materials.find(
-        m => m.name === "Phong_737373_r0.90"
-      );
-      const interior2 = viewer.model.materials.find(
-        m => m.name === "Standard_3A3A3A"
-      );
-      const interior3 = viewer.model.materials.find(
-        m => m.name === "Phong_414141_r0.90"
-      );
-
       const rgba = hexToRgbFactor(color);
+      if (!materialCache.interiors.length) return;
 
-      if (interior1) interior1.pbrMetallicRoughness.setBaseColorFactor(rgba);
-      if (interior2) interior2.pbrMetallicRoughness.setBaseColorFactor(rgba);
-      if (interior3) interior3.pbrMetallicRoughness.setBaseColorFactor(rgba);
+      for (const material of materialCache.interiors) {
+        material.pbrMetallicRoughness.setBaseColorFactor(rgba);
+      }
     }
 
-    function animateColorChange(color, applyFunction) {
-      const fade = document.getElementById("colorFade");
+    function animateColorChange(applyFunction, color = null) {
+      if (!dom.colorFade) return;
 
-      fade.style.background = "#000";
-      fade.style.opacity = "0.20";
+      dom.colorFade.classList.add("active");
 
       setTimeout(() => {
         applyFunction(color);
-      }, 150);
+      }, 80);
 
       setTimeout(() => {
-        fade.style.opacity = "0";
-      }, 600);
+        dom.colorFade.classList.remove("active");
+      }, 240);
     }
 
     function applyWakeMaterial(material, show) {
@@ -473,7 +632,6 @@ Precio total: ${formatPrice(total)}
         } else {
           material.alphaMode = "OPAQUE";
         }
-
         material.pbrMetallicRoughness.setBaseColorFactor([c[0], c[1], c[2], 1]);
       } else {
         if (typeof material.setAlphaMode === "function") {
@@ -481,36 +639,24 @@ Precio total: ${formatPrice(total)}
         } else {
           material.alphaMode = "MASK";
         }
-
         if ("alphaCutoff" in material) {
           material.alphaCutoff = 0.5;
         }
-
         material.pbrMetallicRoughness.setBaseColorFactor([c[0], c[1], c[2], 0]);
       }
     }
 
-    function toggleWake(state) {
-      const viewer = document.querySelector("#boat");
-      if (!viewer.model) return;
+    function syncWakeWithExtra() {
+      const showWake = isWakeSelected();
 
-      const wake1 = viewer.model.materials.find(
-        m => m.name === "Standard_373737"
-      );
-      const wake2 = viewer.model.materials.find(
-        m => m.name === "Material.005"
-      );
-      const wake3 = viewer.model.materials.find(
-        m => m.name === "Material.006"
-      );
+      if (!materialCache.wake.length) return;
 
-      applyWakeMaterial(wake1, state);
-      applyWakeMaterial(wake2, state);
-      applyWakeMaterial(wake3, state);
+      for (const material of materialCache.wake) {
+        applyWakeMaterial(material, showWake);
+      }
     }
 
     function nudgeBoat() {
-      const viewer = document.querySelector("#boat");
       if (!viewer) return;
 
       if (nudgeFrame) {
@@ -523,10 +669,10 @@ Precio total: ${formatPrice(total)}
       const fixedPhi = orbit.phi.toString();
       const fixedRadius = orbit.radius.toString();
 
-      const nudgeRadians = 5 * Math.PI / 180;
+      const nudgeRadians = 2.8 * Math.PI / 180;
       const peakTheta = startTheta + nudgeRadians;
       const endTheta = startTheta;
-      const duration = 520;
+      const duration = 280;
 
       const startTime = performance.now();
 
@@ -537,10 +683,10 @@ Precio total: ${formatPrice(total)}
         let theta;
         if (progress < 0.5) {
           const p = progress / 0.5;
-          theta = startTheta + (peakTheta - startTheta) * (1 - Math.pow(1 - p, 3));
+          theta = startTheta + (peakTheta - startTheta) * (1 - Math.pow(1 - p, 2.4));
         } else {
           const p = (progress - 0.5) / 0.5;
-          theta = peakTheta + (endTheta - peakTheta) * (1 - Math.pow(1 - p, 3));
+          theta = peakTheta + (endTheta - peakTheta) * (1 - Math.pow(1 - p, 2.4));
         }
 
         viewer.cameraOrbit = `${theta}rad ${fixedPhi} ${fixedRadius}`;
@@ -557,60 +703,51 @@ Precio total: ${formatPrice(total)}
     }
 
     function setHull(button, color, label) {
-      document.querySelectorAll(".exterior-swatch").forEach(btn => {
-        btn.classList.remove("active");
-      });
-
+      document.querySelectorAll(".exterior-swatch").forEach(btn => btn.classList.remove("active"));
       button.classList.add("active");
+
       currentHullColor = color;
       currentHullLabel = label;
 
-      animateColorChange(color, changeHull);
+      animateColorChange(changeHull, color);
       nudgeBoat();
       updateConfigURL();
       updatePriceUI();
     }
 
     function setInterior(button, color, label) {
-      document.querySelectorAll(".interior-swatch").forEach(btn => {
-        btn.classList.remove("active");
-      });
-
+      document.querySelectorAll(".interior-swatch").forEach(btn => btn.classList.remove("active"));
       button.classList.add("active");
+
       currentInteriorColor = color;
       currentInteriorLabel = label;
 
-      animateColorChange(color, changeInterior);
+      animateColorChange(changeInterior, color);
       nudgeBoat();
       updateConfigURL();
       updatePriceUI();
     }
 
-    function setWake(state) {
-      toggleWake(state);
+    function toggleExtra(key, state) {
+      const extra = extrasCatalog[key];
+      if (!extra) return;
 
-      const onBtn = document.querySelector("#wake-on");
-      const offBtn = document.querySelector("#wake-off");
+      extra.selected = state;
 
-      if (state) {
-        onBtn.classList.add("active");
-        offBtn.classList.remove("active");
-      } else {
-        offBtn.classList.add("active");
-        onBtn.classList.remove("active");
+      if (key === "wakeBimini") {
+        syncWakeWithExtra();
       }
 
-      currentWakeState = state;
-      animateColorChange("#000", () => {});
-      nudgeBoat();
-      updateConfigURL();
+      renderExtras();
       updatePriceUI();
+      updateConfigURL();
+      nudgeBoat();
     }
 
     function applySavedConfig() {
       changeHull(currentHullColor);
       changeInterior(currentInteriorColor);
-      toggleWake(currentWakeState);
+      syncWakeWithExtra();
 
       document.querySelectorAll(".exterior-swatch").forEach(btn => {
         btn.classList.remove("active");
@@ -628,23 +765,17 @@ Precio total: ${formatPrice(total)}
         }
       });
 
-      const onBtn = document.querySelector("#wake-on");
-      const offBtn = document.querySelector("#wake-off");
-
-      if (currentWakeState) {
-        onBtn.classList.add("active");
-        offBtn.classList.remove("active");
-      } else {
-        offBtn.classList.add("active");
-        onBtn.classList.remove("active");
-      }
-
+      renderExtras();
       updatePriceUI();
     }
 
     function spinBoatOnce() {
-      const viewer = document.querySelector("#boat");
       if (!viewer) return;
+
+      if (spinFrame) {
+        cancelAnimationFrame(spinFrame);
+        spinFrame = null;
+      }
 
       const orbit = viewer.getCameraOrbit();
       const currentRadius = orbit.radius.toString();
@@ -652,30 +783,29 @@ Precio total: ${formatPrice(total)}
 
       const startAngle = 90;
       const endAngle = 450;
-      const duration = 2500;
+      const duration = 1450;
       const startTime = performance.now();
 
       function animate(now) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
+        const eased = 1 - Math.pow(1 - progress, 2.2);
 
         const angle = startAngle + (endAngle - startAngle) * eased;
         viewer.cameraOrbit = `${angle}deg ${currentPhi} ${currentRadius}`;
 
         if (progress < 1) {
-          requestAnimationFrame(animate);
+          spinFrame = requestAnimationFrame(animate);
         } else {
-          viewer.cameraOrbit = `${INITIAL_CAMERA_THETA} ${INITIAL_CAMERA_PHI} ${INITIAL_CAMERA_RADIUS}`;
+          viewer.cameraOrbit = INITIAL_CAMERA_ORBIT;
+          spinFrame = null;
         }
       }
 
-      requestAnimationFrame(animate);
+      spinFrame = requestAnimationFrame(animate);
     }
 
     async function captureBoatImage() {
-      const viewer = document.querySelector("#boat");
-
       if (!viewer || !viewer.model) {
         alert("El modelo todavía no terminó de cargar");
         return;
@@ -684,14 +814,12 @@ Precio total: ${formatPrice(total)}
       try {
         changeHull(currentHullColor);
         changeInterior(currentInteriorColor);
-        toggleWake(currentWakeState);
+        syncWakeWithExtra();
 
         await new Promise(resolve => requestAnimationFrame(resolve));
         await new Promise(resolve => requestAnimationFrame(resolve));
-        await new Promise(resolve => setTimeout(resolve, 180));
 
         const imageURL = viewer.toDataURL("image/png");
-
         const link = document.createElement("a");
         link.href = imageURL;
         link.download = "esteem-configuracion.png";
@@ -703,66 +831,76 @@ Precio total: ${formatPrice(total)}
     }
 
     function setupSidebarToggle() {
-      const sidebar = document.getElementById("sidebar");
-      const toggle = document.getElementById("sidebarToggle");
+      if (!dom.sidebar || !dom.sidebarToggle) return;
 
-      if (!sidebar || !toggle) return;
-
-      toggle.addEventListener("click", () => {
-        sidebar.classList.toggle("collapsed");
+      dom.sidebarToggle.addEventListener("click", () => {
+        dom.sidebar.classList.toggle("collapsed");
         document.body.classList.toggle("sidebar-collapsed");
 
         setTimeout(() => {
-          const viewer = document.getElementById("boat");
           if (viewer && typeof viewer.jumpCameraToGoal === "function") {
             viewer.jumpCameraToGoal();
           }
-        }, 460);
+        }, 320);
       });
     }
 
     function setupMobileScrollHint() {
-      const sidebarInner = document.getElementById("sidebarInner");
-      const hint = document.getElementById("mobileScrollHint");
-      const sidebar = document.getElementById("sidebar");
-
-      if (!sidebarInner || !hint || !sidebar) return;
+      if (!dom.sidebarInner || !dom.mobileScrollHint || !dom.sidebar) return;
 
       const mobileQuery = window.matchMedia("(max-width: 768px)");
 
       function evaluateHint() {
         const isMobile = mobileQuery.matches;
-        const isCollapsed = sidebar.classList.contains("collapsed");
-        const canScroll = sidebarInner.scrollHeight > sidebarInner.clientHeight + 8;
-        const isScrolled = sidebarInner.scrollTop > 16;
+        const isCollapsed = dom.sidebar.classList.contains("collapsed");
+        const canScroll = dom.sidebarInner.scrollHeight > dom.sidebarInner.clientHeight + 8;
+        const isScrolled = dom.sidebarInner.scrollTop > 16;
 
         if (!isMobile || isCollapsed || !canScroll || isScrolled) {
-          hint.classList.remove("show");
+          dom.mobileScrollHint.classList.remove("show");
         } else {
-          hint.classList.add("show");
+          dom.mobileScrollHint.classList.add("show");
         }
       }
 
-      sidebarInner.addEventListener("scroll", evaluateHint);
+      dom.sidebarInner.addEventListener("scroll", evaluateHint, { passive: true });
       window.addEventListener("resize", evaluateHint);
 
-      const toggle = document.getElementById("sidebarToggle");
-      if (toggle) {
-        toggle.addEventListener("click", () => {
-          setTimeout(evaluateHint, 500);
+      if (dom.sidebarToggle) {
+        dom.sidebarToggle.addEventListener("click", () => {
+          setTimeout(evaluateHint, 380);
         });
       }
 
       setTimeout(evaluateHint, 400);
-      setTimeout(evaluateHint, 1200);
-      setTimeout(evaluateHint, 2200);
+      setTimeout(evaluateHint, 1100);
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const viewer = document.querySelector("#boat");
-      const intro = document.querySelector("#intro");
+    function hideIntro() {
+      if (!dom.intro) return;
 
-      if (!viewer || !intro) return;
+      const introOverlay = document.querySelector(".intro-overlay");
+
+      if (introOverlay) {
+        introOverlay.style.opacity = "0";
+      }
+
+      dom.intro.style.opacity = "0";
+
+      setTimeout(() => {
+        dom.intro.style.display = "none";
+      }, 1100);
+    }
+
+    window.openQuoteModal = openQuoteModal;
+    window.closeQuoteModal = closeQuoteModal;
+    window.captureBoatImage = captureBoatImage;
+    window.setHull = setHull;
+    window.setInterior = setInterior;
+    window.toggleExtra = toggleExtra;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      cacheDom();
 
       document.body.classList.remove("sidebar-collapsed");
 
@@ -771,24 +909,10 @@ Precio total: ${formatPrice(total)}
       setupSidebarToggle();
       setupMobileScrollHint();
       updatePriceUI();
-
-      const hideIntro = () => {
-        const introOverlay = document.querySelector(".intro-overlay");
-
-        if (introOverlay) {
-          introOverlay.style.transition = "opacity 3.5s ease-in-out";
-          introOverlay.style.opacity = "0";
-        }
-
-        intro.style.transition = "opacity 2.5s ease-in-out";
-        intro.style.opacity = "0";
-
-        setTimeout(() => {
-          intro.style.display = "none";
-        }, 3500);
-      };
+      renderExtras();
 
       viewer.addEventListener("load", () => {
+        cacheMaterials();
         applySavedConfig();
         hideIntro();
 
@@ -800,7 +924,7 @@ Precio total: ${formatPrice(total)}
 
         setTimeout(() => {
           spinBoatOnce();
-        }, 1200);
+        }, 450);
       });
 
       viewer.addEventListener("error", (e) => {
@@ -808,11 +932,14 @@ Precio total: ${formatPrice(total)}
       });
 
       setTimeout(() => {
-        if (intro.style.display !== "none") {
-          applySavedConfig();
+        if (dom.intro && dom.intro.style.display !== "none") {
+          if (viewer.model) {
+            cacheMaterials();
+            applySavedConfig();
+          }
           hideIntro();
         }
-      }, 5000);
+      }, 3200);
     });
   </script>
 </body>
